@@ -498,7 +498,7 @@ int background_functions(
   if (pba->has_vf == _TRUE_) {
     vphi = pvecback_B[pba->index_bi_phi_vf]; //Short notation
     pvecback[pba->index_bg_phi_vf] = vphi; // value of the vector field vphi
-    pvecback[pba->index_bg_rho_vf] = -vf_A*(vphi*vphi)/6; // density energy of the vector field.
+    pvecback[pba->index_bg_rho_vf] = vphi; // density energy of the vector field.
     rho_tot += pvecback[pba->index_bg_rho_vf]; 
   } 
 
@@ -608,8 +608,8 @@ int background_functions(
    P_{vf} = w_{vf}\rho_{vf}  */
 
   if (pba->has_vf == _TRUE_){
-    vphi_dot = (4*rho_r + 3*rho_m)*vf_s/(2*H*H*(1+vf_s)-2*vf_s*(rho_r+rho_m));
-    w_vf = -1 - 2*vphi_dot/3;
+   // vphi_dot = (4*rho_r + 3*rho_m)*vf_s/(3*H*H*(1+vf_s)-*vf_s*(rho_r+rho_m));
+    w_vf = -1 -(4*rho_r+3*rho_m)*vf_s/(3*H*H*(1+vf_s)-3*vf_s*(rho_r+rho_m));
     pvecback[pba->index_bg_p_vf] = w_vf*pvecback[pba->index_bg_rho_vf];
     p_tot += pvecback[pba->index_bg_p_vf];
     dp_dloga += 0.0;
@@ -639,10 +639,10 @@ int background_functions(
 /* P'_{vf} = w_{vf}*\rho'_{vf} - 2*\epsilon'_{\phi}*\rho_{\phi}/3*/
 
   if (pba->has_vf == _TRUE_) {
-      vphi_dot_prime = -vf_s*(16*rho_r + 9*rho_m)*H*a/(2*H*H*(1+vf_s)-2*vf_s*(rho_r+rho_m));
-      vphi_dot_prime += -vphi_dot*(4*H*pvecback[pba->index_bg_H_prime]*(1+vf_s) + 2*vf_s*(4*rho_r+3*rho_m)*H*a)/(2*H*H*(1+vf_s)-2*vf_s*(rho_r+rho_m));       
+      vphi_dot_prime = vf_s*(16*rho_r + 9*rho_m)*H*a/(3*H*H*(1+vf_s)-3*vf_s*(rho_r+rho_m));
+      vphi_dot_prime += -(1+w_vf)*(2*H*pvecback[pba->index_bg_H_prime]*(1+vf_s) + vf_s*(4*rho_r+3*rho_m)*H*a)/(H*H*(1+vf_s)-vf_s*(rho_r+rho_m));       
       pvecback[pba->index_bg_p_prime_vf] = -3*a*pvecback[pba->index_bg_H]*(1+w_vf)*w_vf*pvecback[pba->index_bg_rho_vf];
-      pvecback[pba->index_bg_p_prime_vf] += -2*vphi_dot_prime*pvecback[pba->index_bg_rho_vf]/3;
+      pvecback[pba->index_bg_p_prime_vf] += -2*vphi_dot_prime*pvecback[pba->index_bg_rho_vf];
       pvecback[pba->index_bg_p_tot_prime] += pvecback[pba->index_bg_p_prime_vf];  
   } 
 
@@ -2782,7 +2782,7 @@ int background_derivs(
   vf_S = pba->vf_parameters[0];
 
   if (pba->has_vf == _TRUE_) {  
-       dy[pba->index_bi_phi_vf] = y[pba->index_bi_phi_vf]*(4*rho_R+3*rho_M)*vf_S/(2*H*H*(1+vf_S)-2*vf_S*(rho_R+rho_M));    
+       dy[pba->index_bi_phi_vf] = y[pba->index_bi_phi_vf]*(4*rho_R+3*rho_M)*vf_S/(H*H*(1+vf_S)-vf_S*(rho_R+rho_M));    
    }  
 
   return _SUCCESS_;
