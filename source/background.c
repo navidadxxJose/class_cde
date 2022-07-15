@@ -399,15 +399,14 @@ int background_functions(
   /* fluid's time-dependent equation of state parameter */
   double w_fld, dw_over_da, integral_fld;
   /* scalar field quantities */
-  double phi, phi_prime;
-  /* vector field quantities */
-  double vphi, vphi_dot, vphi_dot_prime, w_vf;
-  
+  double phi, rho_vf, phi_prime;
+  /* vector field quantities */  
+  double phi_vf, eps_vf, h_vf, eps_dot_vf, w_vf, w_dot_vf;
+  /* Auxiliar vector field quantities */
+  double rho_cdm_vf, rho_dot_cdm_vf, f_vf, rQ_vf, rQ_dot_vf;
   /* Vector field parameters*/
-  double vf_s = pba->vf_parameters[0];             //s
-  double vf_A = pba->vf_parameters[1];             //b2 
-  double vf_B = pba->vf_parameters[2];             //b3
-  double vf_C = 1/(2*pba->vf_parameters[0]-1);     //p3
+  double s_vf, s1_vf, b2_vf, p_vf, q_vf, QQ_vf, P2_vf, P3_vf, phi0_vf; 
+  double Or_vf, Om_vf, Oc_vf, O_vf, Or_dot_vf, O_dot_vf;
 
 
   /* Since we only know a_prime_over_a after we have rho_tot,
@@ -494,13 +493,47 @@ int background_functions(
   }
 
 
+  /* Vector field parameters */
+  if (pba->has_vf == _TRUE_){
+
+    s_vf  = pba->vf_parameters[0];             //s
+    b2_vf = pba->vf_parameters[1];             //b2 
+    P2_vf = pba->vf_parameters[2];
+//    p_vf  = pba->vf_parameters[2];             //p
+//    q_vf  = pba->vf_parameters[3];            //q
+    QQ_vf  = pba->vf_parameters[4];             //Q
+    p_vf  = P2_vf/s_vf;
+    phi0_vf = pba->vf_parameters[5];      // value of rho_vf today   
+    P3_vf = (p_vf-1+2*P2_vf)/2;
+    q_vf  = 2*P3_vf;                      //caso q = 2P3    
+    s1_vf = (2*q_vf-2*P3_vf-1)/p_vf;
+
+  }  
+
+
   /* Vector field' density */
   if (pba->has_vf == _TRUE_) {
-    vphi = pvecback_B[pba->index_bi_phi_vf]; //Short notation
-    pvecback[pba->index_bg_phi_vf] = vphi; // value of the vector field vphi
-    pvecback[pba->index_bg_rho_vf] = vphi; // density energy of the vector field.
+
+    rho_vf = pvecback_B[pba->index_bi_phi_vf]; //Short notation    
+    pvecback[pba->index_bg_rho_vf] = rho_vf; // density energy of the vector field.  
+    phi_vf = sqrt(2.)*pow(-3.*rho_vf/b2_vf,1./2./P2_vf);
+    pvecback[pba->index_bg_phi_vf] = phi_vf; // value of the vector field vphi
     rho_tot += pvecback[pba->index_bg_rho_vf]; 
   } 
+
+  /* Interaction between vector field and cold dark matter */
+
+  if (pba->has_vf == _TRUE_) {
+
+    rQ_vf = -QQ_vf*q_vf*pow(phi_vf,2*q_vf)*pvecback[pba->index_bg_rho_cdm]/pow(2,q_vf)/pow(phi0_vf,2*q_vf)/P2_vf/pvecback[pba->index_bg_rho_vf];
+    f_vf = pow(phi_vf,2*q_vf)/pow(2,q_vf)/pow(phi0_vf,2*q_vf);
+    rho_cdm_vf = QQ_vf*f_vf*pvecback[pba->index_bg_rho_cdm];
+    rho_tot += rho_cdm_vf;
+    p_tot += 0.;
+    pvecback[pba->index_bg_rQ_vf] = rQ_vf;  
+    pvecback[pba->index_bg_rho_cdm_vf] = rho_cdm_vf;     
+
+  }  
 
 
 
@@ -608,12 +641,21 @@ int background_functions(
    P_{vf} = w_{vf}\rho_{vf}  */
 
   if (pba->has_vf == _TRUE_){
-   // vphi_dot = (4*rho_r + 3*rho_m)*vf_s/(3*H*H*(1+vf_s)-*vf_s*(rho_r+rho_m));
-    w_vf = -1 -(4*rho_r+3*rho_m)*vf_s/(3*H*H*(1+vf_s)-3*vf_s*(rho_r+rho_m));
+
+    Or_vf = rho_r/H/H;
+    Om_vf = rho_m/H/H;
+    Oc_vf = rho_cdm_vf/H/H;
+    O_vf  = 1.-Or_vf-Om_vf-Oc_vf; 
+
+
+    eps_vf = s_vf*(3.*(1.+rQ_vf)+(1.-rQ_vf)*(Or_vf-3*O_vf))/(1+s1_vf*rQ_vf+O_vf*pow(rQ_vf-1,2)*s_vf); 
+
+    w_vf = -1 + eps_vf*(rQ_vf-1)/3;
+
     pvecback[pba->index_bg_p_vf] = w_vf*pvecback[pba->index_bg_rho_vf];
     p_tot += pvecback[pba->index_bg_p_vf];
-    dp_dloga += 0.0;
-  } 
+    dp_dloga += 0.0; 
+  }  
 
   /** - compute derivative of H with respect to conformal time */
   pvecback[pba->index_bg_H_prime] = - (3./2.) * (rho_tot + p_tot) * a + pba->K/a;
@@ -639,12 +681,27 @@ int background_functions(
 /* P'_{vf} = w_{vf}*\rho'_{vf} - 2*\epsilon'_{\phi}*\rho_{\phi}/3*/
 
   if (pba->has_vf == _TRUE_) {
-      vphi_dot_prime = vf_s*(16*rho_r + 9*rho_m)*H*a/(3*H*H*(1+vf_s)-3*vf_s*(rho_r+rho_m));
-      vphi_dot_prime += -(1+w_vf)*(2*H*pvecback[pba->index_bg_H_prime]*(1+vf_s) + vf_s*(4*rho_r+3*rho_m)*H*a)/(H*H*(1+vf_s)-vf_s*(rho_r+rho_m));       
-      pvecback[pba->index_bg_p_prime_vf] = -3*a*pvecback[pba->index_bg_H]*(1+w_vf)*w_vf*pvecback[pba->index_bg_rho_vf];
-      pvecback[pba->index_bg_p_prime_vf] += -2*vphi_dot_prime*pvecback[pba->index_bg_rho_vf];
-      pvecback[pba->index_bg_p_tot_prime] += pvecback[pba->index_bg_p_prime_vf];  
-  } 
+
+    double A_vf;
+    A_vf = (1+s1_vf*rQ_vf+O_vf*pow(rQ_vf-1,2)*s_vf);
+
+
+    rQ_dot_vf = (eps_vf*(q_vf-P2_vf)/P2_vf-3)*H*rQ_vf;          //r_{Q}'
+    h_vf = pvecback[pba->index_bg_H_prime]/a/H/H; 
+    rho_dot_cdm_vf = (q_vf*eps_vf/2/P2_vf-3)*H*rho_cdm_vf;
+
+    Or_dot_vf = -2*Or_vf*H*(2+h_vf);
+    O_dot_vf  = O_vf*H*(eps_vf-2*h_vf);
+
+
+    eps_dot_vf  = s_vf*(rQ_dot_vf*(3-Or_vf+3*O_vf)+(1-rQ_vf)*(Or_dot_vf-3*O_dot_vf))/A_vf;
+    eps_dot_vf += -eps_vf*(rQ_dot_vf*(s1_vf+2*O_vf*(rQ_vf-1))+O_dot_vf*pow(rQ_vf-1,2))/A_vf;
+
+    w_dot_vf = (eps_dot_vf*(rQ_vf-1) + rQ_dot_vf*eps_vf)/3;
+
+    pvecback[pba->index_bg_p_prime_vf] = (w_dot_vf + H*w_vf*eps_vf)*a*pvecback[pba->index_bg_rho_vf];
+    pvecback[pba->index_bg_p_tot_prime] += pvecback[pba->index_bg_p_prime_vf];   
+  }  
 
   /** - compute critical density */
   rho_crit = rho_tot-pba->K/a/a;
@@ -1129,7 +1186,10 @@ int background_indices(
   class_define_index(pba->index_bg_phi_vf,pba->has_vf,index_bg,1);
   class_define_index(pba->index_bg_rho_vf,pba->has_vf,index_bg,1);
   class_define_index(pba->index_bg_p_vf,pba->has_vf,index_bg,1);
-  class_define_index(pba->index_bg_p_prime_vf,pba->has_vf,index_bg,1); 
+  class_define_index(pba->index_bg_p_prime_vf,pba->has_vf,index_bg,1);
+  class_define_index(pba->index_bg_rQ_vf,pba->has_vf,index_bg,1);
+  class_define_index(pba->index_bg_rho_cdm_vf,pba->has_vf,index_bg,1);  
+
 
   /* - index for Lambda */
   class_define_index(pba->index_bg_rho_lambda,pba->has_lambda,index_bg,1);
@@ -2156,14 +2216,10 @@ int background_solve(
       printf("    Vector field details:\n");
       printf("     -> Omega_vf = %g, wished %g\n",
              pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_vf]/pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_crit], pba->Omega0_vf);
-      if (pba->has_lambda == _TRUE_) {
-        printf("     -> Omega_Lambda = %g, wished %g\n",
-               pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_lambda]/pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_crit], pba->Omega0_lambda);
-     }
-      printf("     -> parameters: [s, b2, b3, phi_ini] = \n");
+      printf(" -> Vector field parameters: [s, b2, p, q, Q, rho_0, Z_ini, Q_ini, phi_ini] = \n");
       printf("                    [");
       for (index_vf=0; index_vf<pba->vf_parameters_size-1; index_vf++) {
-        printf("%.3f, ",pba->vf_parameters[index_vf]);
+        printf("%.e, ",pba->vf_parameters[index_vf]);
       }
      printf("%.e]\n",pba->vf_parameters[pba->vf_parameters_size-1]);
     } 
@@ -2564,6 +2620,8 @@ int background_output_titles(
   class_store_columntitle(titles,"(.)p_vf",pba->has_vf);
   class_store_columntitle(titles,"(.)p_prime_vf",pba->has_vf);
   class_store_columntitle(titles,"phi_vf",pba->has_vf);
+  class_store_columntitle(titles,"rQ_vf",pba->has_vf);  
+  class_store_columntitle(titles,"(.)rho_cdm_vf",pba->has_vf);  
 
 
   class_store_columntitle(titles,"(.)rho_tot",_TRUE_);
@@ -2643,6 +2701,9 @@ int background_output_data(
     class_store_double(dataptr,pvecback[pba->index_bg_p_vf],pba->has_vf,storeidx);
     class_store_double(dataptr,pvecback[pba->index_bg_p_prime_vf],pba->has_vf,storeidx);
     class_store_double(dataptr,pvecback[pba->index_bg_phi_vf],pba->has_vf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_rQ_vf],pba->has_vf,storeidx); 
+    class_store_double(dataptr,pvecback[pba->index_bg_rho_cdm_vf],pba->has_vf,storeidx);      
+
 
 
     class_store_double(dataptr,pvecback[pba->index_bg_rho_tot],_TRUE_,storeidx);
@@ -2702,6 +2763,10 @@ int background_derivs(
   struct background_parameters_and_workspace * pbpaw;
   struct background * pba;
   double * pvecback, a, H, rho_M, rho_R, vf_S;
+  double phi_vf, rho_vf, eps_vf;
+  double rQ_vf, rho_cdm_vf, f_vf;
+  double s_vf, s1_vf, p_vf, P2_vf, P3_vf, q_vf, QQ_vf, phi0_vf, b2_vf;
+  double Or_vf, Om_vf, Oc_vf, O_vf, Or_dot_vf, O_dot_vf;  
 
   pbpaw = parameters_and_workspace;
   pba =  pbpaw->pba;
@@ -2768,22 +2833,50 @@ int background_derivs(
 
 
 
-    /** - Compute vector field: \f$ \phi'=\phi\epsilon_{\phi}*a*H \f$
-        written as \f$ d\phi/dlna = phi' / (aH) \f$  */
+    /** - Compute vector field: \f$ \phi'=\phi\epsilon_{\phi} \f$
+        written as \f$ d\phi/dlna = phi' \f$  */
 
-/* \epsilon_{\phi} is a function of \rho_r, rho_m and H. */
-/* \epsilon_{\phi} is explicitly written */ 
 
-  rho_R = pvecback[pba->index_bg_rho_g];
-  if (pba->has_ur == _TRUE_) {
-    rho_R += pvecback[pba->index_bg_rho_ur];
-  }
+  if (pba->has_vf == _TRUE_) { 
 
-  vf_S = pba->vf_parameters[0];
+    s_vf   = pba->vf_parameters[0];             //s
+    b2_vf  = pba->vf_parameters[1];            //b2    
+    P2_vf  = pba->vf_parameters[2];             //p
+//    q_vf   = pba->vf_parameters[3];             //q = 2P3
+    QQ_vf  = pba->vf_parameters[4];             //Q
+    p_vf  = P2_vf/s_vf;
+    phi0_vf = pba->vf_parameters[5];      // value of phi_vf today   
+    P3_vf = (p_vf-1+2*P2_vf)/2;
+    q_vf  = 2*P3_vf;           //caso q = 2P3        
+    s1_vf = (2*q_vf-2*P3_vf-1)/p_vf;
 
-  if (pba->has_vf == _TRUE_) {  
-       dy[pba->index_bi_phi_vf] = y[pba->index_bi_phi_vf]*(4*rho_R+3*rho_M)*vf_S/(H*H*(1+vf_S)-vf_S*(rho_R+rho_M));    
-   }  
+
+
+
+
+    rho_vf = y[pba->index_bi_phi_vf];;
+    phi_vf = sqrt(2.)*pow(-3.*rho_vf/b2_vf,1./2./P2_vf);
+
+
+   rQ_vf = -QQ_vf*q_vf*pow(phi_vf,2*q_vf)*pvecback[pba->index_bg_rho_cdm]/pow(2,q_vf)/pow(phi0_vf,2*q_vf)/P2_vf/pvecback[pba->index_bg_rho_vf];
+   f_vf = pow(phi_vf,2*q_vf)/pow(2,q_vf)/pow(phi0_vf,2*q_vf);
+   rho_cdm_vf = QQ_vf*f_vf*pvecback[pba->index_bg_rho_cdm];   
+
+    rho_R = pvecback[pba->index_bg_rho_g];
+    if (pba->has_ur == _TRUE_) {
+      rho_R += pvecback[pba->index_bg_rho_ur];
+    }
+
+    Or_vf = rho_R/H/H;
+    Om_vf = rho_M/H/H;
+    Oc_vf = rho_cdm_vf/H/H;
+    O_vf  = 1.-Or_vf-Om_vf-Oc_vf; 
+
+    eps_vf = s_vf*(3*(1.+rQ_vf)+(1-rQ_vf)*(Or_vf-3*O_vf))/(1+s1_vf*rQ_vf+O_vf*pow(rQ_vf-1,2)*s_vf); 
+
+    dy[pba->index_bi_phi_vf] = rho_vf*eps_vf;  
+  
+  }  
 
   return _SUCCESS_;
 
@@ -2962,9 +3055,9 @@ int background_output_budget(
       budget_radiation+=pba->Omega0_idr;
     }
 
-    if ((pba->has_lambda == _TRUE_) || (pba->has_fld == _TRUE_) || (pba->has_scf == _TRUE_) || (pba->has_curvature == _TRUE_)) {
+    if ((pba->has_lambda == _TRUE_) || (pba->has_fld == _TRUE_) || (pba->has_scf == _TRUE_) || (pba->has_vf == _TRUE_) || (pba->has_curvature == _TRUE_)) {
       printf(" ---> Other Content \n");
-    }
+    }  
     if (pba->has_lambda == _TRUE_) {
       class_print_species("Cosmological Constant",lambda);
       budget_other+=pba->Omega0_lambda;
@@ -2980,7 +3073,7 @@ int background_output_budget(
     if (pba->has_vf == _TRUE_) {
       class_print_species("Vector Field",vf);
       budget_other+=pba->Omega0_vf;
-    }
+    }  
     if (pba->has_curvature == _TRUE_) {
       class_print_species("Spatial Curvature",k);
       budget_other+=pba->Omega0_k;
