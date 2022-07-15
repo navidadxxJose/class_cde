@@ -3147,7 +3147,7 @@ class_test((flag1 == _TRUE_) && (flag2 == _TRUE_) && (flag3 == _TRUE_) && (flag4
                errmsg,errmsg);
 
 /* Jose's test */
-    printf("vector field's parameters [s,b2,b3,phi0] = [%e,%e,%e,%e] \n",pba->vf_parameters[0],pba->vf_parameters[1],pba->vf_parameters[2],pba->vf_parameters[3]);
+//    printf("vector field's parameters [s,b2,b3,phi0] = [%e,%e,%e,%e] \n",pba->vf_parameters[0],pba->vf_parameters[1],pba->vf_parameters[2],pba->vf_parameters[3]);
 
 
     /** 8.c.2) VF initial conditions */
