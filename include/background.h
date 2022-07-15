@@ -193,10 +193,11 @@ struct background
 
 
   int index_bg_phi_vf;       /**< vector field value */
+  int index_bg_rQ_vf;        /**<  coupling parameter */
   int index_bg_rho_vf;       /**< vector field energy density */
   int index_bg_p_vf;         /**< vector field pressure */
   int index_bg_p_prime_vf;   /**< vector field pressure derivative */
-
+  int index_bg_rho_cdm_vf;       /**< coupled dark matter density.  */
 
   int index_bg_rho_ncdm1;     /**< density of first ncdm species (others contiguous) */
   int index_bg_p_ncdm1;       /**< pressure of first ncdm species (others contiguous) */
