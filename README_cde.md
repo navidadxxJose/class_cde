@@ -66,7 +66,7 @@ Numerical Solution for cdm
 We have an option in .ini files to solve numerically a differential equation for dark matter:
 ''_num_sol_cdm_vf = yes or no_''
 
-If it is written yes, Class solves the following equations: $\rho_{cdm}'= -3\rho_{cdm} + \frac{q}{p2} \frac{Q f(X)}}{p2(\beta+Qf(X))}\epsilon_{\phi}\rho_{cdm}$.
+If it is written yes, Class solves the following equations: $\rho_{cdm}'= -3\rho_{cdm} + \frac{q}{p2} \frac{Q f(X)}{p2(\beta+Qf(X))}\epsilon_{\phi}\rho_{cdm}$.
 Where $\epsilon_{\phi}$ is defined in ArXiv:..., $\beta$ is the parameter beta and the derivative is in e-fold number.
 
 On the other hand, if it is written no, Class makes cdm as $\rho_{cdm} = \rho_{cdm}^{0}(\beta + Qf(X))a^{-3}$, wiht $a$ the scale factor. 
