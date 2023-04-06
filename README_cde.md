@@ -32,7 +32,7 @@ At background level the objective is to solve a diferential equaiton for $\rho_{
 rho_vf_ini is a stimated values for $\rho_{DE}(t_{ini})$. Actually, This vaule is found by a procces denominated in Class as shooting, it is mechanism to find zero of functions.    
 
 
-To find rho_vf_ini, we found the behavior of $rho_{DE}$ in the radiation dominated epoch. We obtained $\rho_{DE} \propto a^{4s}$. The proportional factor is rho_vf_ini which is determined by Class (from our estimated starting value) using shooting. 
+To find rho_vf_ini, we found the behavior of $\rho_{DE}$ in the radiation dominated epoch. We obtained $\rho_{DE} \propto a^{4s}$. The proportional factor is rho_vf_ini which is determined by Class (from our estimated starting value) using shooting. 
 
 
 
@@ -50,12 +50,12 @@ The model has got nine parameters [s, b2, p2, beta ,Q, q, Z_ini, Q_ini, rho_vf_i
 We fix q in background.c as q=2p_3 based in arXiv:1907.12216v2, however, if you wish to change it, look for 'q_vf = 2.p3_vf' in background.c and perturbations.c and switch to
 q_vf  =  pba->vf_parameters[5] .  
 
-In /ini_file_cde you will find a variety of .ini files with different values for Q, s, and p2. b2 must be a negative value to avoid negative values for the density energy of dark energy. We choose b2 = -1, nevertheless, other values can be used. They just will rescale the initial conditions of $\rho_{DE}$.
+In _/ini_file_cde_ you will find a variety of .ini files with different values for Q, s, and p2. b2 must be less than zero to avoid negative values for the density energy of dark energy. We choose b2 = -1, nevertheless, other values can be used. They just will rescale the initial conditions of $\rho_{DE}$.
 
 
 To run an example with $Q = 0$, $p2 = 5$, and $s=0.2$  type 
 
-./class ini_file_cde/s_02/Q_0/p_1.ini 
+_./class ini_file_cde/s_02/Q_0/p_1.ini_ 
 
 Keep in mind that not all parameter settings are possible.   
 
@@ -64,18 +64,18 @@ Numerical Solution for cdm
 -------------------------------
 
 We have an option in .ini files to solve numerically a differential equation for dark matter:
-''num_sol_cdm_vf = yes or no''
+''_num_sol_cdm_vf = yes or no_''
 
-If it is write yes, Class solve the following equations: $\rho_{cdm}'= -3\rho_{cdm} + \frac{q Q f(X)\epsilon_{\phi}\rho_{cdm}}{p2(\beta+Qf(X))}$.
-Where $\epsion_{\phi}$ is defined in ArXiv:... and $\beta$ is the parameter beta 
+If it is written yes, Class solves the following equations: $\rho_{cdm}'= -3\rho_{cdm} + \frac{q}{p2} \frac{Q f(X)}}{p2(\beta+Qf(X))}\epsilon_{\phi}\rho_{cdm}$.
+Where $\epsilon_{\phi}$ is defined in ArXiv:..., $\beta$ is the parameter beta and the derivative is in e-fold number.
 
-On the other hand, if it is write no, Class will cdm as $\rho_{cdm} = \rho_{cdm}^{0}(\beta + Qf(X))a^{-3}$, wiht $a$ the scale factor. 
-
-
-In ini_file_cde/beta_1/cdm_num you will find .ini files to execute Class solving numerically cdm. 
+On the other hand, if it is written no, Class makes cdm as $\rho_{cdm} = \rho_{cdm}^{0}(\beta + Qf(X))a^{-3}$, wiht $a$ the scale factor. 
 
 
-The file vector_field.ini can run the vector field model. In this, you can change freely the parameters of the model. 
+In _ini_file_cde/beta_1/cdm_num_ you will find .ini files to execute Class solving numerically cdm. 
+
+
+The file _vector_field.ini_ can run the vector field model. In this, you can change freely the parameters of the model. 
 
 
 Our Modifications to Class
