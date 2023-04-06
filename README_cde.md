@@ -29,7 +29,7 @@ Backgorund
 -----------------------
 At background level the objective is to solve a diferential equaiton for $\rho_{DE}$. Then, we need to include a variables to asignes the initial conditions, it is called rho_vf_ini. 
 
-rho_vf_ini is a stimated values for $\rho_{DE}(t_ini)$. Actually, This vaule is found by a procces denominated in Class as shooting, it is mechanism to find zero of functions.    
+rho_vf_ini is a stimated values for $\rho_{DE}(t_{ini})$. Actually, This vaule is found by a procces denominated in Class as shooting, it is mechanism to find zero of functions.    
 
 
 To find rho_vf_ini, we found the behavior of $rho_{DE}$ in the radiation dominated epoch. We obtained $\rho_{DE} \propto a^{4s}$. The proportional factor is rho_vf_ini which is determined by Class (from our estimated starting value) using shooting. 
