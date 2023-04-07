@@ -5890,8 +5890,8 @@ int perturbations_initial_conditions(struct precision * ppr,
       }
 
       if (pba->has_vf == _TRUE_) {      
-        ppw->pv->y[ppw->pv->index_pt_Z_vf] = pba->vf_parameters[5];
-        ppw->pv->y[ppw->pv->index_pt_Q_vf] = pba->vf_parameters[6];   
+        ppw->pv->y[ppw->pv->index_pt_Z_vf] = pba->vf_parameters[6];
+        ppw->pv->y[ppw->pv->index_pt_Q_vf] = pba->vf_parameters[7];   
       }  
 
       if ((pba->has_ur == _TRUE_) || (pba->has_ncdm == _TRUE_) || (pba->has_dr == _TRUE_)  || (pba->has_idr == _TRUE_)) {
@@ -8184,7 +8184,7 @@ int perturbations_sources(
      p_vf  = p2_vf/s_vf;
      p3_vf = (p_vf-1.+2.*p2_vf)/2.; 
      q_vf  = 2.*p3_vf;                         //caso q = 2P3    
-//     q_vf  = pba->vf_parameters[3];           //q
+//     q_vf  = pba->vf_parameters[5];           //q
      s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
 
      rho_vf = ppw->pvecback[pba->index_bg_rho_vf];
@@ -8645,7 +8645,7 @@ int perturbations_print_variables(double tau,
       p_vf  = p2_vf/s_vf;
       p3_vf = (p_vf-1.+2.*p2_vf)/2.; 
       q_vf  = 2.*p3_vf;                         //caso q = 2P3    
-//      q_vf  = pba->vf_parameters[3];           //q
+//      q_vf  = pba->vf_parameters[5];           //q
       s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
 
       rho_vf = ppw->pvecback[pba->index_bg_rho_vf];
@@ -9763,7 +9763,7 @@ int perturbations_derivs(double tau,
      phi0_vf = sqrt(2.0)*pow(pba->H0,1.0/p2_vf)*pow(-3.0*pba->Omega0_vf/b2_vf,1.0/2.0/p2_vf);  // value of rho_vf today   
      p3_vf = (p_vf-1.+2.*p2_vf)/2.;
      q_vf  = 2.*p3_vf;                      //case q = 2P3    
-//      q_vf  = pba->vf_parameters[3];           //q
+//      q_vf  = pba->vf_parameters[5];           //q
      s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
 
 
