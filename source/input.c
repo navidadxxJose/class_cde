@@ -3162,6 +3162,9 @@ int input_read_parameters_species(struct file_content * pfc,
   class_test((flag4 == _FALSE_) && ((flag1 == _FALSE_)||(flag2 == _FALSE_)) && ((flag3 == _TRUE_) && (param3 < 0.)),
              errmsg,
              "You have entered 'Omega_scf' < 0 , so you have to specify both 'Omega_lambda' and 'Omega_fld'.");
+  class_test((flag4 == _TRUE_) && ((param1 > 0.)||(param2 >0.) || (param3 > 0. )),
+             errmsg,
+             "'Omega_Lambda', 'Omega_fld'', and 'Omega_scf'' must be left equals to zero if you want to run the vector field model.");  
   /* Complete set of parameters
      Case of (flag3 == _FALSE_) || (param3 >= 0.) means that either we have not
      read Omega_scf so we are ignoring it (unlike lambda and fld!) OR we have
