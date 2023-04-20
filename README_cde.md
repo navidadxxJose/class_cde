@@ -48,7 +48,10 @@ Paramereters
 The model has got nine parameters [s, b2, p2, beta ,Q, q, Z_ini, Q_ini, rho_vf_ini].
 
 We fix q in background.c as q=2p_3 based in arXiv:1907.12216v2, however, if you wish to change it, look for 'q_vf = 2.p3_vf' in background.c and perturbations.c and switch to
-q_vf  =  pba->vf_parameters[5] .  
+q_vf  =  pba->vf_parameters[5] .
+
+The option _vf_tuning_index_ in the .ini files correspond to the parameter in _vf_parameters_ that will be used to find the correct Omega_vf today using the shooting routine such as in the scalar filed case. _vf_tuning_index_ will be the number of the initial condition rho_vf_ini in _vf_parameters_, namely, 8.  
+
 
 In _/ini_file_cde_ you will find a variety of .ini files with different values for Q, s, and p2. b2 must be less than zero to avoid negative values for the density energy of dark energy. We choose b2 = -1, nevertheless, other values can be used. They just will rescale the initial conditions of $\rho_{DE}$.
 
