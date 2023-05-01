@@ -5611,8 +5611,8 @@ int perturbations_initial_conditions(struct precision * ppr,
 
 
       if (pba->has_vf == _TRUE_) {       
-        ppw->pv->y[ppw->pv->index_pt_Z_vf] = pba->vf_parameters[6];
-        ppw->pv->y[ppw->pv->index_pt_Q_vf] = pba->vf_parameters[7];
+        ppw->pv->y[ppw->pv->index_pt_Z_vf] = pba->vf_parameters[0];
+        ppw->pv->y[ppw->pv->index_pt_Q_vf] = pba->vf_parameters[1];
       } 
 
 
@@ -5890,8 +5890,8 @@ int perturbations_initial_conditions(struct precision * ppr,
       }
 
       if (pba->has_vf == _TRUE_) {      
-        ppw->pv->y[ppw->pv->index_pt_Z_vf] = pba->vf_parameters[6];
-        ppw->pv->y[ppw->pv->index_pt_Q_vf] = pba->vf_parameters[7];   
+        ppw->pv->y[ppw->pv->index_pt_Z_vf] = pba->vf_parameters[0];
+        ppw->pv->y[ppw->pv->index_pt_Q_vf] = pba->vf_parameters[1];   
       }  
 
       if ((pba->has_ur == _TRUE_) || (pba->has_ncdm == _TRUE_) || (pba->has_dr == _TRUE_)  || (pba->has_idr == _TRUE_)) {
@@ -7252,17 +7252,17 @@ int perturbations_total_stress_energy(
     /* Vector field contribution. */
     if (pba->has_vf == _TRUE_) {
 
-      s_vf  = pba->vf_parameters[0];           //s 
-      p2_vf = pba->vf_parameters[2];
-      QQ_vf = pba->vf_parameters[4];
+      s_vf  = pba->vf_parameters_1;           //s 
+      p2_vf = pba->vf_parameters_2;
+      QQ_vf = pba->vf_parameters_3;
       p_vf  = p2_vf/s_vf;
       p3_vf = (p_vf-1.+2.*p2_vf)/2.; 
 
   /* According to arXiv:1907.12216v2 we chose q_vf = 2p3_vf. */
-  /* However, there is a free space in  pba->vf_parameters[5] if you want to select another value for q_vf*/
+  /* However, there is a free space in  pba->vf_parameters_4 if you want to select another value for q_vf*/
 
-      q_vf = 2.*p3_vf;                          //q = 2p3
-//    q_vf  =  pba->vf_parameters[5];           // Do not comment if you want to give a values for q in a .ini file          
+//      q_vf = 2.*p3_vf;                          //q = 2p3
+      q_vf  =  pba->vf_parameters_4;           // Do not comment if you want to give a values for q in a .ini file          
       s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
 
 
@@ -8178,13 +8178,13 @@ int perturbations_sources(
 
     if (pba->has_vf == _TRUE_) {
 
-     s_vf  = pba->vf_parameters[0];           //s 
-     p2_vf = pba->vf_parameters[2];
-     QQ_vf = pba->vf_parameters[4];           //Q 
+     s_vf  = pba->vf_parameters_1;           //s 
+     p2_vf = pba->vf_parameters_2;
+     QQ_vf = pba->vf_parameters_3;           //Q 
      p_vf  = p2_vf/s_vf;
      p3_vf = (p_vf-1.+2.*p2_vf)/2.; 
-     q_vf  = 2.*p3_vf;                         //caso q = 2P3    
-//     q_vf  = pba->vf_parameters[5];           //q
+//     q_vf  = 2.*p3_vf;                         //caso q = 2P3    
+     q_vf  = pba->vf_parameters_4;           //q
      s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
 
      rho_vf = ppw->pvecback[pba->index_bg_rho_vf];
@@ -8639,13 +8639,13 @@ int perturbations_print_variables(double tau,
 
     if (pba->has_vf == _TRUE_) {
      
-      s_vf  = pba->vf_parameters[0];           //s 
-      p2_vf = pba->vf_parameters[2];
-      QQ_vf = pba->vf_parameters[4];           //Q 
+      s_vf  = pba->vf_parameters_1;           //s 
+      p2_vf = pba->vf_parameters_2;
+      QQ_vf = pba->vf_parameters_3;           //Q 
       p_vf  = p2_vf/s_vf;
       p3_vf = (p_vf-1.+2.*p2_vf)/2.; 
-      q_vf  = 2.*p3_vf;                         //caso q = 2P3    
-//      q_vf  = pba->vf_parameters[5];           //q
+//      q_vf  = 2.*p3_vf;                         //caso q = 2P3    
+      q_vf  = pba->vf_parameters_4;           //q
       s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
 
       rho_vf = ppw->pvecback[pba->index_bg_rho_vf];
@@ -9755,15 +9755,15 @@ int perturbations_derivs(double tau,
 
     if (pba->has_vf == _TRUE_) {
  
-     s_vf  = pba->vf_parameters[0];             //s
-     b2_vf = pba->vf_parameters[1];             //b2 
-     p2_vf = pba->vf_parameters[2];             //P2
-     QQ_vf  = pba->vf_parameters[4];            //Q
+     s_vf  = pba->vf_parameters_1;             //s
+     b2_vf = -1.0;                             //b2 
+     p2_vf = pba->vf_parameters_2;             //P2
+     QQ_vf = pba->vf_parameters_3;            //Q
      p_vf  = p2_vf/s_vf;
      phi0_vf = sqrt(2.0)*pow(pba->H0,1.0/p2_vf)*pow(-3.0*pba->Omega0_vf/b2_vf,1.0/2.0/p2_vf);  // value of rho_vf today   
      p3_vf = (p_vf-1.+2.*p2_vf)/2.;
-     q_vf  = 2.*p3_vf;                      //case q = 2P3    
-//      q_vf  = pba->vf_parameters[5];           //q
+//     q_vf  = 2.*p3_vf;                      //case q = 2P3    
+     q_vf  = pba->vf_parameters_4;           //q
      s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
 
 
