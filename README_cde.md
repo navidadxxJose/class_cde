@@ -25,7 +25,7 @@ The shape of the coupling
 -------------------------
 The model includes another parameter called beta. We have two ways to introduce the coupling term choosing either beta = 1 or beta = 0. The first one corresponds to arXiv:1907.12216v2 where they consider a lagrangian density for cdm and an additional one for the interaction. While the second one is associated with arXiv:2207.13682v1 where there is only one lagrangian density for cdm and the interaction.  
 
-Backgorund
+Background
 -----------------------
 At background level the objective is to solve a diferential equaiton for $\rho_{DE}$. Then, we need to include a variables to asignes the initial conditions, it is called rho_vf_ini. 
 
@@ -45,20 +45,27 @@ If you want to run Class using dark energy as a vector field energy density, the
 
 Paramereters
 -----------------------
-The model has got nine parameters [s, b2, p2, beta ,Q, q, Z_ini, Q_ini, rho_vf_ini].
+The model has got five parameters
+_vf_parameters_1_ = $s$
+_vf_parameters_2_ = $p_{2}$
+_vf_parameters_3_ = $Q$
+_vf_parameters_4_ = $q$
+_vf_parameters_5_ = beta
+and three initial conditions 
+_vf_parameters[Z_ini, Q_ini, rho_vf_ini]_.
 
-We fix q in background.c as q=2p_3 based in arXiv:1907.12216v2, however, if you wish to change it, look for 'q_vf = 2.p3_vf' in background.c and perturbations.c and switch to
-q_vf  =  pba->vf_parameters[5] .
+We fix q in background.c as $q=2p_{3}$ based in arXiv:1907.12216v2, however, if you wish to change it, look for '_q_vf = 2.p3_vf_' in background.c and perturbations.c and switch to
+_q_vf  =  pba->vf_parameters_4_ .
 
-The option _vf_tuning_index_ in the .ini files correspond to the parameter in _vf_parameters_ that will be used to find the correct Omega_vf today using the shooting routine such as in the scalar filed case. _vf_tuning_index_ will be the number of the initial condition rho_vf_ini in _vf_parameters_, namely, 8.  
-
-
-In _/ini_file_cde_ you will find a variety of .ini files with different values for Q, s, and p2. b2 must be less than zero to avoid negative values for the density energy of dark energy. We choose b2 = -1, nevertheless, other values can be used. They just will rescale the initial conditions of $\rho_{DE}$.
+The option _vf_tuning_index_ in the .ini files correspond to the parameter in _vf_parameters_ that will be used to find the correct $\Omega_DE$ today using the shooting routine such as in the scalar filed case. _vf_tuning_index_ will be the number of the initial condition _rho_vf_ini_ in _vf_parameters_, namely, 2.  
 
 
-To run an example with $Q = 0$, $p2 = 5$, and $s=0.2$  type 
+In _/ini_file_cde_ you will find a variety of .ini files with different values for $Q$, and $p_{2}$. $b_{2}$ must be less than zero to avoid negative values for the density energy of dark energy. We choose $b_{2} = -1$, nevertheless, other values can be used. They just will rescale the initial conditions of $\rho_{DE}$.
 
-_./class ini_file_cde/s_02/Q_0/p_1.ini_ 
+
+To run an example with $s=1.0·, $p2 = 1.0$, $Q = 0.2$, and $q=2.0$  type 
+
+_./class ini_file_cde/s_1_Q_02.ini_ 
 
 Keep in mind that not all parameter settings are possible.   
 
