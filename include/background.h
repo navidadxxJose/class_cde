@@ -126,6 +126,11 @@ struct background
 
 
   double * vf_parameters;  /* Parameters of the vector field model */
+  double vf_parameters_1;
+  double vf_parameters_2;
+  double vf_parameters_3;
+  double vf_parameters_4;
+  double vf_parameters_5;
   int vf_parameters_size;  /**< size of vf_parameters */
   int vf_tuning_index;    /**< index in vf_parameters used for tuning */
   short num_sol_cdm_vf;   /**< whether the diferential equation of cdm will be solve*/
@@ -196,7 +201,7 @@ struct background
   int index_bg_p_prime_scf;         /**< scalar field pressure */
 
   int index_bg_phi_vf;       /**< vector field value */
-  int index_bg_rQ_vf;        /**<  coupling parameter */
+  int index_bg_rQ_vf;        /**< coupling parameter */
   int index_bg_rho_vf;       /**< vector field energy density */
   int index_bg_p_vf;         /**< vector field pressure */
   int index_bg_p_prime_vf;   /**< vector field pressure derivative */
