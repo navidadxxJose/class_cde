@@ -63,7 +63,7 @@ The option _vf_tuning_index_ in the .ini files correspond to the parameter in _v
 In _/ini_file_cde_ you will find a variety of .ini files with different values for $Q$, and $p_{2}$. $b_{2}$ must be less than zero to avoid negative values for the density energy of dark energy. We choose $b_{2} = -1$, nevertheless, other values can be used. They just will rescale the initial conditions of $\rho_{DE}$.
 
 
-To run an example with $s=1.0·, $p2 = 1.0$, $Q = 0.2$, and $q=2.0$  type 
+To run an example with $s=1.0, $p2 = 1.0$, $Q = 0.2$, and $q=2.0$  type 
 
 _./class ini_file_cde/s_1_Q_02.ini_ 
 
