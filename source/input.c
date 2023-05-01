@@ -3342,9 +3342,9 @@ int input_read_parameters_species(struct file_content * pfc,
   }
 
 
-  if (pba->Omega0_vf != 0.){
-
   /** 8.c) If Omega vector field is different from 0 */
+
+  if (pba->Omega0_vf != 0.){
 
     /** 8.c.1) Additional VF parameters */
     /* Read */
@@ -3355,6 +3355,13 @@ int input_read_parameters_species(struct file_content * pfc,
                                            &flag1,
                                            errmsg),
                errmsg,errmsg);
+
+
+    class_read_double("vf_parameters_1",pba->vf_parameters_1);
+    class_read_double("vf_parameters_2",pba->vf_parameters_2);
+    class_read_double("vf_parameters_3",pba->vf_parameters_3);
+    class_read_double("vf_parameters_4",pba->vf_parameters_4);
+    class_read_double("vf_parameters_5",pba->vf_parameters_5);
 
 
     /** 8.b.2) VF tuning parameter */
@@ -3389,7 +3396,6 @@ int input_read_parameters_species(struct file_content * pfc,
         pba->has_cdm_vf = _FALSE_;
       }
     }
-
 
   }
 
@@ -5878,6 +5884,10 @@ int input_default_params(struct background *pba,
   /** 9.c.1) Potential parameters and initial conditions */
   pba->vf_parameters = NULL;
   pba->vf_parameters_size = 0;
+  pba->vf_parameters_1 = 0.0;
+  pba->vf_parameters_2 = 0.0;
+  pba->vf_parameters_3 = 0.0;
+  pba->vf_parameters_4 = 0.0;  
  
   /** To solve cdm numerically (vf) */ 
   pba->has_cdm_vf = _FALSE_;
