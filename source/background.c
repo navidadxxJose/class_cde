@@ -513,26 +513,27 @@ int background_functions(
 
    /* Vector field parameters*/
 
-    s_vf  = pba->vf_parameters[0];             //s
-    b2_vf = pba->vf_parameters[1];             //b2 
-    p2_vf = pba->vf_parameters[2];             //p2
-    QQ_vf  = pba->vf_parameters[4];             //Q
+    s_vf  = pba->vf_parameters_1;             //s
+    p2_vf = pba->vf_parameters_2;             //p2
+    QQ_vf = pba->vf_parameters_3;             //Q
     p_vf  = p2_vf/s_vf;
     phi0_vf = sqrt(2.0)*pow(pba->H0,1.0/p2_vf)*pow(3.0*pba->Omega0_vf,1.0/2.0/p2_vf);  // value of phi_vf (vector field) today
-    p3_vf = (p_vf-1.+2.*p2_vf)/2.;
+    p3_vf = (p_vf-1.+2.*p2_vf)/2.;            //p3
+  //Since the units of rho_vf are set automatically by setting the initial conditions we only choose the sign of b2, it is negative because rho_vf has to be positive.  
+    b2_vf = -1.;                              //b2 
 
   /* According to arXiv:1907.12216v2 we chose q_vf = 2p3_vf. */
-  /* However, there is a free space in  pba->vf_parameters[5] if you want to select another value for q_vf*/
+  /* However, there is a free space in  pba->vf_parameters_4 if you want to select another value for q_vf*/
 
-    q_vf = 2.*p3_vf;                            //q = 2p3
-//    q_vf  =  pba->vf_parameters[5];           // Do not comment if you want to give a values for q in a .ini file          
-
-
-    s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf; 
-    beta_vf = pba->vf_parameters[3];      // beta = 1 (case arXiv:1907.12216v2), beta = 0 (case arXiv:2207.13682v1)
+//    q_vf = 2.*p3_vf;                      //q = 2p3
+    q_vf  = pba->vf_parameters_4;          // Do not comment if you want to give a values for q in a .ini file          
 
 
-  /* Vector field' density */
+    s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;    //s1
+    beta_vf = pba->vf_parameters_5;        // beta = 1 (case arXiv:1907.12216v2), beta = 0 (case arXiv:2207.13682v1)
+
+
+  /* Vector field's density */
 
     rho_vf = pvecback_B[pba->index_bi_rho_vf]; //Short notation    
     pvecback[pba->index_bg_rho_vf] = rho_vf; // density energy of the vector field.  
@@ -728,9 +729,9 @@ int background_functions(
     Or_dot_vf = -2.*Or_vf*H*(2.+h_vf);      // \dot{\Omega_{r}}
     O_dot_vf  = O_vf*H*(eps_vf-2.*h_vf);    // \dot{\Omega_{vf}}
 
-    /* derivative of the auxiliar variable \epsilon_{\phi} */
+    /* derivative of the auxiliar variable \epsilon_{\phi} */ 
     eps_dot_vf  = s_vf*(rQ_dot_vf*(3.-Or_vf+3.*O_vf)+(1.-rQ_vf)*(Or_dot_vf-3.*O_dot_vf))/A_vf;
-    eps_dot_vf += -eps_vf*(rQ_dot_vf*(s1_vf+2.*O_vf*(rQ_vf-1.))+O_dot_vf*pow(rQ_vf-1.,2.))/A_vf;   //\dot{\epsilon_{\phi}}
+    eps_dot_vf += -eps_vf*(rQ_dot_vf*(s1_vf+2.*s_vf*O_vf*(rQ_vf-1.))+O_dot_vf*s_vf*pow(rQ_vf-1.,2.))/A_vf;   //\dot{\epsilon_{\phi}}
 
     /* Derivative of the dark energy equation of states */
     w_dot_vf = (eps_dot_vf*(rQ_vf-1.) + rQ_dot_vf*eps_vf)/3.;
@@ -1230,7 +1231,6 @@ int background_indices(
   class_define_index(pba->index_bg_p_vf,pba->has_vf,index_bg,1);
   class_define_index(pba->index_bg_p_prime_vf,pba->has_vf,index_bg,1);
   class_define_index(pba->index_bg_rQ_vf,pba->has_vf,index_bg,1);
-//  class_define_index(pba->index_bg_rho_cdm_vf,pba->has_vf,index_bg,1);  
 
 
   /* - index for Lambda */
@@ -2258,12 +2258,18 @@ int background_solve(
       printf("    Vector field details:\n");
       printf("     -> Omega_vf = %g, wished %g\n",
              pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_vf]/pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_crit], pba->Omega0_vf);
-      printf(" -> Vector field parameters: [s, b2, p2, beta, Q, q, Z_ini, Q_ini, rho_vf_ini] = \n");
+//      printf(" -> Vector field parameters: [s, p2, beta, Q, q] = \n");
+      printf("s  -> %.e \n",pba->vf_parameters_1);
+      printf("p2 -> %.e \n",pba->vf_parameters_2);
+      printf("Q  -> %.e \n",pba->vf_parameters_3);
+      printf("q  -> %.e \n",pba->vf_parameters_4);
+      printf("beta -> %.e \n",pba->vf_parameters_5);
+      printf(" -> Vector field initial conditions: [Z_ini, Q_ini, rho_vf_ini] = \n");
       printf("                    [");
       for (index_vf=0; index_vf<pba->vf_parameters_size-1; index_vf++) {
         printf("%.e, ",pba->vf_parameters[index_vf]);
       }
-     printf("%.e]\n",pow(10.0,-pba->vf_parameters[pba->vf_parameters_size-1])*pow(ppr->a_ini_over_a_today_default,4.*pba->vf_parameters[0]));
+      printf("%.e]\n",pow(10.0,-pba->vf_parameters[pba->vf_parameters_size-1])*pow(ppr->a_ini_over_a_today_default,4.*pba->vf_parameters[0]));
     } 
     if (pba->has_cdm_vf == _TRUE_) {
       printf(" ->Computing CDM numerically \n");
@@ -2477,7 +2483,7 @@ int background_initial_conditions(
    // - Fix initial value of \f$ \rho_{DE} \f$
   
  if (pba->has_vf == _TRUE_) {        
-    pvecback_integration[pba->index_bi_rho_vf] = pow(10.0,-pba->vf_parameters[pba->vf_parameters_size-1])*pow(a,4.*pba->vf_parameters[0]); 
+    pvecback_integration[pba->index_bi_rho_vf] = pow(10.0,-pba->vf_parameters[pba->vf_parameters_size-1])*pow(a,4.*pba->vf_parameters_1); 
 
     class_test(!isfinite(pvecback_integration[pba->index_bi_rho_vf]) ||
                !isfinite(pvecback_integration[pba->index_bi_rho_vf]),
@@ -2862,21 +2868,21 @@ int background_derivs(
   if (pba->has_vf == _TRUE_) { 
 
 
-    s_vf   = pba->vf_parameters[0];             //s
-    b2_vf  = pba->vf_parameters[1];            //b2    
-    p2_vf  = pba->vf_parameters[2];             //p
-    QQ_vf  = pba->vf_parameters[4];             //Q
+    s_vf   = pba->vf_parameters_1;             //s
+    b2_vf  = -1.;                              //b2    
+    p2_vf  = pba->vf_parameters_2;             //p
+    QQ_vf  = pba->vf_parameters_3;             //Q
     p_vf  = p2_vf/s_vf;
     phi0_vf = sqrt(2.0)*pow(pba->H0,1.0/p2_vf)*pow(3.0*pba->Omega0_vf,1.0/2.0/p2_vf);
     p3_vf = (p_vf-1.+2.*p2_vf)/2.;
 
   /* According to arXiv:1907.12216v2 we chose q_vf = 2p3_vf. */
-  /* However, there is a free space in  pba->vf_parameters[5] if you want to select another value for q_vf*/
+  /* However, there is a free space in  pba->vf_parameters_4 if you want to select another value for q_vf*/
 
-    q_vf = 2.*p3_vf;                            //q
-//    q_vf  =  pba->vf_parameters[5];           // Do not comment if you want to give values for q        
+//    q_vf = 2.*p3_vf;                       //q
+    q_vf  =  pba->vf_parameters_4;           // Do not comment if you want to give values for q        
     s1_vf = (2.*q_vf-2.*p3_vf-1.)/p_vf;
-    beta_vf = pba->vf_parameters[3];
+    beta_vf = pba->vf_parameters_5;
 
     rho_vf = y[pba->index_bi_rho_vf];
     phi_vf = sqrt(2.)*pow(-3.*rho_vf/b2_vf,1./2./p2_vf);
