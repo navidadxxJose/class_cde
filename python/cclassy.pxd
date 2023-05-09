@@ -111,6 +111,11 @@ cdef extern from "class.h":
         double tau_eq
         double Omega0_vf   
         double * vf_parameters
+        double vf_parameters_1;
+        double vf_parameters_2;
+        double vf_parameters_3;
+        double vf_parameters_4;
+        double vf_parameters_5;
         int vf_tuning_index
         short num_sol_cdm_vf         
 
