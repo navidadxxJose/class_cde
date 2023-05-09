@@ -166,8 +166,10 @@ if TEST_LEVEL > 2:
         'normal')
 
     CLASS_INPUT['vector_field'] = (
-        [{'Omega_vf': -1.0,
-        'vf_parameters': '1.0, -1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 10.0'}],
+        [{'Omega_vf': -1.0, 'vf_parameters_1': '1.0',
+        'vf_parameters_2': '1.0', 'vf_parameters_3': '0.0',
+        'vf_parameters_4': '0.0', 'vf_parameters_5': '1.0',
+        'vf_parameters': '0.0, 0.0, 10.0','vf_tuning_index':'2'}],
         'normal')
 
     CLASS_INPUT['Inflation'] = (
